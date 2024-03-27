@@ -58,7 +58,7 @@ def compare_autocorrelation(iat, bench_path, string):
 
 
 if __name__ == "__main__":
-    LEVEL = "level2"
+    LEVEL = "level3"
     path = "/home/ben/Desktop/benchmarks/"
     kernels_list = {"SDK": {"conjugate-gradient": [2, 3]},
                     "pannotia": {"color-max": [1],
@@ -87,7 +87,12 @@ if __name__ == "__main__":
                 intensity = {"real": [], "synthetic": []}
                 temporal = {"real": [], "synthetic": []}
 
+                if not os.path.exists(synthetic_path):
+                    os.mkdir(synthetic_path)
+
                 for file_n in ["iat", "intensity", "temporal"]:
+                    syn_content = []
+                    real_content = []
                     for f in os.listdir(synthetic_path):
                         if file_n in f and f.split(".")[1] == "txt":
                             with open(synthetic_path + f, "r") as list_file:

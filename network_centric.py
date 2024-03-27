@@ -190,6 +190,7 @@ def generate_temporal_burst_level3(request_packet):
     burst_duration_chain = dict(sorted(burst_duration_chain.items(), key=lambda x: x[0]))
     for prev in burst_duration_chain.keys():
         burst_duration_chain[prev] = dict(sorted(burst_duration_chain[prev].items(), key=lambda x: x[0]))
+    burst_volume_chain = dict(sorted(burst_volume_chain.items(), key=lambda x: x[0]))
     for dur in burst_volume_chain.keys():
         burst_volume_chain[dur] = dict(sorted(burst_volume_chain[dur].items(), key=lambda x: x[0]))
     return cycle, iat, burst_duration_chain, burst_volume_chain
