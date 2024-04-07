@@ -1,5 +1,4 @@
 
-
 def generate_temporal_burst_level1(request_packet):
     """
     This is the first level of temporal burstiness statistics capturing.
@@ -13,11 +12,12 @@ def generate_temporal_burst_level1(request_packet):
     burst = {}
     cycle = {"cycle": 0}
     for packet in request_packet:
-        if int(packet.split("\t")[5].split(": ")[1]) not in trace.keys():
-            trace[int(packet.split("\t")[5].split(": ")[1])] = int(packet.split("\t")[7].split(": ")[1])
-        else:
-            trace[int(packet.split("\t")[5].split(": ")[1])] += int(packet.split("\t")[7].split(": ")[1])
-        cycle["cycle"] = int(packet.split("\t")[5].split(": ")[1])
+        if packet.split("\t")[0] == "request injected":
+            if int(packet.split("\t")[5].split(": ")[1]) not in trace.keys():
+                trace[int(packet.split("\t")[5].split(": ")[1])] = int(packet.split("\t")[7].split(": ")[1])
+            else:
+                trace[int(packet.split("\t")[5].split(": ")[1])] += int(packet.split("\t")[7].split(": ")[1])
+            cycle["cycle"] = int(packet.split("\t")[5].split(": ")[1])
     prev_off = int(list(trace.keys())[0])
     prev_on = int(list(trace.keys())[0])
     volume = 0
@@ -52,6 +52,54 @@ def generate_temporal_burst_level1(request_packet):
     return cycle, iat, burst
 
 
+def generate_spatial_burst_level1(request_packet):
+    """
+        - source chip is chosen randomly based on memoyless distribution
+        - destination is chosen depended on the source
+        - packet is chosen depended on the destination
+        - memory latency is chosen randomly
+    """
+    source = {}
+    destination = {}
+    packet_type = {}
+    for packet in request_packet:
+        if packet.split("\t")[0] == "request injected":
+            src = int(packet.split("\t")[1].split(": ")[1])
+            dst = int(packet.split("\t")[2].split(": ")[1])
+            sze = int(packet.split("\t")[7].split(": ")[1])
+            if src not in source.keys():
+                source[src] = 1
+            else:
+                source[src] += 1
+            if src not in destination.keys():
+                destination.setdefault(src, {})[dst] = 1
+            else:
+                if dst not in destination[src].keys():
+                    destination[src][dst] = 1
+                else:
+                    destination[src][dst] += 1
+            if src not in packet_type.keys():
+                packet_type.setdefault(src, {}).setdefault(dst, {})[sze] = 1
+            else:
+                if dst not in packet_type[src].keys():
+                    packet_type[src].setdefault(dst, {})[sze] = 1
+                else:
+                    if sze not in packet_type[src][dst].keys():
+                        packet_type[src][dst][sze] = 1
+                    else:
+                        packet_type[src][dst][sze] += 1
+    source = dict(sorted(source.items(), key=lambda x: x[0]))
+    destination = dict(sorted(destination.items(), key=lambda x: x[0]))
+    for src in destination.keys():
+        destination[src] = dict(sorted(destination[src].items(), key=lambda x: x[0]))
+    packet_type = dict(sorted(packet_type.items(), key=lambda x: x[0]))
+    for src in packet_type.keys():
+        packet_type[src] = dict(sorted(packet_type[src].items(), key=lambda x: x[0]))
+        for dst in packet_type[src].keys():
+            packet_type[src][dst] = dict(sorted(packet_type[src][dst].items(), key=lambda x: x[0]))
+    return source, destination, packet_type
+
+
 def generate_temporal_burst_level2(request_packet):
     """
     This is the second level of temporal burstiness statistics capturing.
@@ -65,11 +113,12 @@ def generate_temporal_burst_level2(request_packet):
     burst = {}
     cycle = {}
     for packet in request_packet:
-        if int(packet.split("\t")[5].split(": ")[1]) not in trace.keys():
-            trace[int(packet.split("\t")[5].split(": ")[1])] = int(packet.split("\t")[7].split(": ")[1])
-        else:
-            trace[int(packet.split("\t")[5].split(": ")[1])] += int(packet.split("\t")[7].split(": ")[1])
-        cycle["cycle"] = int(packet.split("\t")[5].split(": ")[1])
+        if packet.split("\t")[0] == "request injected":
+            if int(packet.split("\t")[5].split(": ")[1]) not in trace.keys():
+                trace[int(packet.split("\t")[5].split(": ")[1])] = int(packet.split("\t")[7].split(": ")[1])
+            else:
+                trace[int(packet.split("\t")[5].split(": ")[1])] += int(packet.split("\t")[7].split(": ")[1])
+            cycle["cycle"] = int(packet.split("\t")[5].split(": ")[1])
     prev_off = int(list(trace.keys())[0])
     prev_on = int(list(trace.keys())[0])
     prev_iat = 0
@@ -127,11 +176,12 @@ def generate_temporal_burst_level3(request_packet):
     burst_duration_chain = {}
     cycle = {}
     for packet in request_packet:
-        if int(packet.split("\t")[5].split(": ")[1]) not in trace.keys():
-            trace[int(packet.split("\t")[5].split(": ")[1])] = int(packet.split("\t")[7].split(": ")[1])
-        else:
-            trace[int(packet.split("\t")[5].split(": ")[1])] += int(packet.split("\t")[7].split(": ")[1])
-        cycle["cycle"] = int(packet.split("\t")[5].split(": ")[1])
+        if packet.split("\t")[0] == "request injected":
+            if int(packet.split("\t")[5].split(": ")[1]) not in trace.keys():
+                trace[int(packet.split("\t")[5].split(": ")[1])] = int(packet.split("\t")[7].split(": ")[1])
+            else:
+                trace[int(packet.split("\t")[5].split(": ")[1])] += int(packet.split("\t")[7].split(": ")[1])
+            cycle["cycle"] = int(packet.split("\t")[5].split(": ")[1])
     prev_off = int(list(trace.keys())[0])
     prev_on = int(list(trace.keys())[0])
     prev_iat = 0
@@ -196,8 +246,33 @@ def generate_temporal_burst_level3(request_packet):
     return cycle, iat, burst_duration_chain, burst_volume_chain
 
 
-def spatial_locality(request_packet):
-    pass
+def generate_memory_latency(request_packet):
+    trace = {}
+    latency = {}
+    for packet in request_packet:
+        if int(packet.split("\t")[3].split(": ")[1]) not in trace.keys():
+            trace.setdefault(int(packet.split("\t")[3].split(": ")[1]), []).append(packet)
+        else:
+            trace[int(packet.split("\t")[3].split(": ")[1])].append(packet)
+    for id, packet in trace.items():
+        start = 0
+        for step in packet:
+            if step.split("\t")[0] == "request received":
+                start = int(step.split("\t")[5].split(": ")[1])
+            elif step.split("\t")[0] == "reply injected":
+                end = int(step.split("\t")[5].split(": ")[1])
+                chip = int(step.split("\t")[6].split(": ")[1])
+                if chip not in latency.keys():
+                    latency.setdefault(chip, {})[end - start] = 1
+                else:
+                    if end - start not in latency[chip].keys():
+                        latency[chip][end - start] = 1
+                    else:
+                        latency[chip][end - start] += 1
+    latency = dict(sorted(latency.items(), key=lambda x: x[0]))
+    for src in latency.keys():
+        latency[src] = dict(sorted(latency[src].items(), key=lambda x: x[0]))
+    return latency
 
 
 def generate_network_centric_model(request_packet, level):
@@ -207,8 +282,14 @@ def generate_network_centric_model(request_packet, level):
     cycle = {}
     burst_volume = {}
     burst_duration = {}
+    source = {}
+    destination = {}
+    packet_type = {}
+    latency = {}
     if level == "level1":
         cycle, iat, burst = generate_temporal_burst_level1(request_packet)
+        source, destination, packet_type = generate_spatial_burst_level1(request_packet)
+        latency = generate_memory_latency(request_packet)
     elif level == "level2":
         cycle, iat, burst = generate_temporal_burst_level2(request_packet)
     elif level == "level3":
@@ -226,6 +307,20 @@ def generate_network_centric_model(request_packet, level):
         data["temporal"].setdefault("volume", {})
         for dur, volume in burst.items():
             data["temporal"]["volume"][dur] = volume
+        data.setdefault("spatial", {}).setdefault("source", {})
+        data["spatial"]["source"] = source
+        data["spatial"].setdefault("chip", {})
+        per_core = {}
+        for src in destination.keys():
+            if src not in per_core.keys():
+                per_core.setdefault(src, {})
+        for src in destination.keys():
+            per_core[src]["destination"] = destination[src]
+        for src in packet_type.keys():
+            per_core[src]["packet"] = packet_type[src]
+        for src in latency.keys():
+            per_core[src]["latency"] = latency[src]
+        data["spatial"]["chip"] = per_core
     elif level == "level3":
         data.setdefault("cycle", {})
         data["cycle"] = cycle

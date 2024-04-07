@@ -2,11 +2,11 @@ from utils import *
 from network_centric import *
 import json
 
-MODEL_LEVEL = "level3"
+MODEL_LEVEL = "level1"
 
 if __name__ == "__main__":
-    path = "/home/ben/Desktop/accelsim-chiplet_ideal_noc/test/bfs_64k/kernels/"
-    trace_name = "4_ideal.txt"
+    path = "/home/ben/Desktop/test/ring/NVLink4/4chiplet/data/synthetic/"
+    trace_name = "trace0.txt"
     request_packet = capture_requests(path, trace_name)
     data = generate_network_centric_model(request_packet, MODEL_LEVEL)
 
