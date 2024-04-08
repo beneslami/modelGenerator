@@ -217,7 +217,7 @@ if __name__ == "__main__":
                                   "syr2k": [1],
                                   "2mm": [1],
                                   "gemm": [1]},
-                    "rodinia": {"b+tree": [1, 2],
+                    "rodinia": {"b+tree": [1],
                                 "bt": [1, 2],
                                 "cfd": [3],
                                 "gaussian": [2, 4, 6],
