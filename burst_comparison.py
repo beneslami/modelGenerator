@@ -142,4 +142,4 @@ if __name__ == "__main__":
 
     with open(path + LEVEL + ".csv", "w") as file:
         for item in output:
-            file.write(item + "\n")
+            file.write(item)
