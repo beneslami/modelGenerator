@@ -234,7 +234,7 @@ if __name__ == "__main__":
             for nv in ["NVLink4", "NVLink3", "NVLink2", "NVLikn1"]:
                 file_path = path + suite + "/" + bench + "/ring/" + nv + "/4chiplet/"
                 if os.path.exists(file_path):
-                    """for name in os.listdir(file_path + "kernels/"):
+                    for name in os.listdir(file_path + "kernels/"):
                         if (not os.path.isdir(name)) and int(name.split(".")[0].split("_")[-1]) in kernels_list[suite][bench]:
                             file_name = file_path + "kernels/" + name
                             request = extract_traffic(file_name)
@@ -256,7 +256,7 @@ if __name__ == "__main__":
                             latency = packet_latency_dist(request)
                             with open(save_path + "/packet_latency_dist.csv") as file:
                                 for k, v in latency.items():
-                                    file.write(str(k) + "," + str(v))"""
+                                    file.write(str(k) + "," + str(v))
                     for i in kernels_list[suite][bench]:
                         collect_output_numbers(suite, bench, i, file_path, file_path + "data/" + str(i) + "/")
                 else:

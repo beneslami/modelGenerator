@@ -8,7 +8,7 @@ def capture_requests(path, file_name):
         raw_content = file.readlines()
     request_packet = []
     for line in raw_content:
-        if line.split("\t")[0] == "request injected" or line.split("\t")[0] == "request received" or line.split("\t")[0] == "reply injected":
+        if line.split("\t")[0] == "request injected" or line.split("\t")[0] == "request received" or line.split("\t")[0] == "reply injected" or line.split("\t")[0] == "reply received":
             request_packet.append(line)
     return request_packet
 
