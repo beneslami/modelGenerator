@@ -192,7 +192,7 @@ def collect_output_numbers(suite, bench, kernel_id, file_path, save_path):
                         flag1 = 0
                         flag2 = 0
                         break
-            with open(save_path + "accelsim.csv", "w") as file:
+            with open(save_path + "/accelsim.csv", "w") as file:
                 file.write(string)
             break
 

@@ -156,6 +156,30 @@ def capture_network_latency(fullsystem_path, synthetic_packet_latency_freq, outp
     pass
 
 
+def collect_ipc(fullsystem_path, synthetic_path):
+    real = 0.0
+    syn = 0.0
+    return real, syn
+
+
+def collect_throughput(fullsystem_path, synthetic_path):
+    real = 0.0
+    syn = 0.0
+    return real, syn
+
+
+def collect_packet_latency(fullsystem_path, synthetic_path):
+    real = 0.0
+    syn = 0.0
+    return real, syn
+
+
+def collect_network_latency(fullsystem_path, synthetic_path):
+    real = 0.0
+    syn = 0.0
+    return real, syn
+
+
 if __name__ == "__main__":
     LEVEL = "level1"
     path = "/home/ben/Desktop/benchmarks/"
@@ -242,9 +266,58 @@ if __name__ == "__main__":
             file.write(string)
 
     ########################################-relative/absolute average latency/throughput-######################################
-    absolute_throughput = ["avg throughput,NVLink1,NVLink2,NVLink3,NVLink4"]
-    absolute_latency = ["avg latency,NVLink1,NVLink2,NVLink3,NVLink4"]
+    absolute_throughput_err = ["avg throughput,NVLink1,NVLink2,NVLink3,NVLink4"]
+    absolute_packet_latency_err = ["avg P latency,NVLink1,NVLink2,NVLink3,NVLink4"]
+    absolute_network_latency_err = ["avg N latency,NVLink1,NVLink2,NVLink3,NVLink4"]
     relative_throughput = ["throughput,NVLink1,NVLink2,NVLink3,NVLink4"]
     relative_latency = ["throughput,NVLink1,NVLink2,NVLink3,NVLink4"]
-
-
+    absolute_ipc = ["ipc,NVLink1,NVLink2,NVLink3,NVLink4"]
+    relative_ipc = ["ipc,NVLink1,NVLink2,NVLink3,NVLink4"]
+    for suite in kernels_list.keys():
+        for bench, k_list in kernels_list[suite].items():
+            for kernel in k_list:
+                abs_thr_string = suite + "," + bench + "," + str(kernel) + ","
+                abs_plat_string = suite + "," + bench + "," + str(kernel) + ","
+                abs_nlat_string = suite + "," + bench + "," + str(kernel) + ","
+                thr_real = ["full system,"]
+                thr_synt = ["synthetic,"]
+                plat_real = ["full system,"]
+                plat_synt = ["synthetic,"]
+                nlat_real = ["full system,"]
+                nlat_synt = ["synthetic,"]
+                for nv in ["NVLink1", "NVLink2", "NVLink3", "NVLink4"]:
+                    fullsystem_path = path + suite + "/" + bench + "/ring/" + nv + "/4chiplet/data/fullsystem/" + str(
+                        kernel) + "/accelsim.csv"
+                    synthetic_path = path + suite + "/" + bench + "/ring/" + nv + "/4chiplet/data/synthetic/" + LEVEL + "/" + str(
+                        kernel) + "/booksim.txt"
+                    output_path = path + suite + "/" + bench + "/ring/" + nv + "/4chiplet/output/" + LEVEL + "/" + str(
+                        kernel) + "/"
+                    #real_ipc, synthetic_ipc = collect_ipc(fullsystem_path, synthetic_path)
+                    real_thr, synthetic_thr = collect_throughput(fullsystem_path, synthetic_path)
+                    thr_real[0] += str(real_thr) + ","
+                    thr_synt[0] += str(synthetic_thr) + ","
+                    real_plat, synthetic_plat = collect_packet_latency(fullsystem_path, synthetic_path)
+                    plat_real[0] += str(real_plat) + ","
+                    plat_synt[0] += str(synthetic_plat) + ","
+                    real_nlat, synthetic_nlat = collect_network_latency(fullsystem_path, synthetic_path)
+                    abs_thr_string += str(np.abs(real_thr - synthetic_thr)) + ","
+                    abs_plat_string += str(np.abs(real_plat - synthetic_plat)) + ","
+                    abs_nlat_string += str(np.abs(real_nlat - synthetic_nlat)) + ","
+                absolute_throughput_err.append(abs_thr_string)
+                absolute_packet_latency_err.append(abs_plat_string)
+                absolute_network_latency_err.append(abs_nlat_string)
+                with open(output_path + "absolute_throughput.csv", "w") as file:
+                    file.write("AVG throughput,NVLink1,NVLink2,NVLink3,NVLink4")
+                    file.write(thr_real[0])
+                    file.write(thr_synt[0])
+                    file.write(abs_thr_string)
+                with open(output_path + "absolute_packet_latency.csv", "w") as file:
+                    file.write("AVG throughput,NVLink1,NVLink2,NVLink3,NVLink4")
+                    file.write(plat_real[0])
+                    file.write(plat_synt[0])
+                    file.write(abs_plat_string)
+                with open(output_path + "absolute_network_latency.csv", "w") as file:
+                    file.write("AVG throughput,NVLink1,NVLink2,NVLink3,NVLink4")
+                    file.write(nlat_real[0])
+                    file.write(nlat_synt[0])
+                    file.write(abs_nlat_string)
