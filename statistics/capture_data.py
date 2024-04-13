@@ -229,5 +229,3 @@ if __name__ == "__main__":
                                     file.write(str(k) + "," + str(v))
                     for i in benchlist.kernels_list[suite][bench]:
                         collect_output_numbers(suite, bench, i, file_path, file_path + "data/" + str(i) + "/")
-                else:
-                    print(suite + " " + bench + " not exist")
