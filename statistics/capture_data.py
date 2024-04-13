@@ -1,4 +1,5 @@
 import os
+import benchlist
 
 
 def extract_traffic(file_name):
@@ -198,44 +199,13 @@ def collect_output_numbers(suite, bench, kernel_id, file_path, save_path):
 
 
 if __name__ == "__main__":
-    path = ""
-    kernels_list = {"SDK": {"conjugate-gradient": [2, 3],
-                            "matrixmul": [1]},
-                    "cutlass": {"splitk-gemm": [2]},
-                    "deepbench": {"gemm": [3, 5, 6],
-                                  "rnn": [4, 8, 10]},
-                    "pannotia": {"color-max": [1],
-                                 "color-maxmin": [2, 3, 4, 5, 7, 8, 9, 10],
-                                 "pagerank-spmv": [2, 3, 5, 7, 9],
-                                 "sssp": [3, 6, 9],
-                                 "fw": [1],
-                                 "pagerank": [2, 4]},
-                    "parboil": {"mri-gridding": [1],
-                                "spmv": [1],
-                                "cutcp": [1]},
-                    "polybnech": {"syrk": [1],
-                                  "syr2k": [1],
-                                  "2mm": [1],
-                                  "gemm": [1]},
-                    "rodinia": {"b+tree": [1],
-                                "bt": [1, 2],
-                                "cfd": [3],
-                                "gaussian": [2, 4, 6],
-                                "hybridsort": [4, 5, 6, 7, 8, 9, 10],
-                                "lud": [3, 6, 9]},
-                    "shoc": {"FFT": [3]},
-                    "UVM": {"lr": [1, 3, 6, 8, 11, 13]},
-                    "tango": {"AlexNet": [1],
-                            "ResNet": [1],
-                            "SqueezeNet": [1]}
-                    }
-    for suite in kernels_list.keys():
-        for bench in kernels_list[suite].keys():
+    for suite in benchlist.kernels_list.keys():
+        for bench in benchlist.kernels_list[suite].keys():
             for nv in ["NVLink4", "NVLink3", "NVLink2", "NVLikn1"]:
-                file_path = path + suite + "/" + bench + "/ring/" + nv + "/4chiplet/"
+                file_path = benchlist.path + suite + "/" + bench + "/ring/" + nv + "/4chiplet/"
                 if os.path.exists(file_path):
                     for name in os.listdir(file_path + "kernels/"):
-                        if (not os.path.isdir(name)) and int(name.split(".")[0].split("_")[-1]) in kernels_list[suite][bench]:
+                        if (not os.path.isdir(name)) and int(name.split(".")[0].split("_")[-1]) in benchlist.kernels_list[suite][bench]:
                             file_name = file_path + "kernels/" + name
                             request = extract_traffic(file_name)
                             iat, burst, combo = generate_temporal_burst(request)
@@ -257,7 +227,7 @@ if __name__ == "__main__":
                             with open(save_path + "/packet_latency_dist.csv") as file:
                                 for k, v in latency.items():
                                     file.write(str(k) + "," + str(v))
-                    for i in kernels_list[suite][bench]:
+                    for i in benchlist.kernels_list[suite][bench]:
                         collect_output_numbers(suite, bench, i, file_path, file_path + "data/" + str(i) + "/")
                 else:
                     print(suite + " " + bench + " not exist")
