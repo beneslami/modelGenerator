@@ -12,7 +12,7 @@ import throughput_analysis
 if __name__ == "__main__":
     LEVEL = "level1"
     ######################################-burst analysis-#######################################
-    for nv in ["NVLink4", "NVLink3", "NVLink2", "NVLink1"]:
+    """for nv in ["NVLink4", "NVLink3", "NVLink2", "NVLink1"]:
         burst_comparison_out = [",,,IAT,IAT,IAT,Burst_int,Burst_int,Burst_int",
                                 ",,kernel,hellinger,MAE,hurst,hellinger,MAE,hurst"]
         for suite in benchlist.kernels_list.keys():
@@ -23,15 +23,16 @@ if __name__ == "__main__":
                     output_path = benchlist.path + suite + "/" + bench + "/ring/" + nv + "/4chiplet/output/" + LEVEL + "/" + str(kernel) + "/"
                     if not os.path.exists(output_path):
                         os.makedirs(output_path)
+                    temporal_analysis.capture_burst(synthetic_path)
                     hell_iat, mae_iat, hurst_iat, hell_int, mae_int, hurst_int = temporal_analysis.burst_comparison(fullsystem_path, synthetic_path, output_path)
                     burst_string = suite + "," + bench + "," + str(kernel) + "," + str(hell_int) + "," + str(mae_int) + "," + str(hurst_iat) + "," + str(hell_int) + "," + str(mae_int) + "," + str(hurst_int)
                     burst_comparison_out.append(burst_string)
         with open(benchlist.path + "burst_analysis_" + nv + ".csv", "w") as file:
             for string in burst_comparison_out:
                 file.write(string)
-
+    print("burst analysis finished")"""
     #######################################-packet latency difference (hellinger)-######################################
-    packet_latency_hellinger = [",,,Hellinger distance for packet latency distribution,Hellinger distance for packet "
+    """packet_latency_hellinger = [",,,Hellinger distance for packet latency distribution,Hellinger distance for packet "
                                 "latency distribution,Hellinger distance for packet latency distribution,Hellinger "
                                 "distance for packet latency distribution", ",,kernel,NVLink4,NVLink3,NVLink2,NVLink1"]
     for suite in benchlist.kernels_list.keys():
@@ -45,15 +46,16 @@ if __name__ == "__main__":
                         kernel) + "/"
                     output_path = benchlist.path + suite + "/" + bench + "/ring/" + nv + "/4chiplet/output/" + LEVEL + "/" + str(
                         kernel) + "/"
-                    request_packet = utils.capture_requests(synthetic_path, "trace_0.txt")  # TODO: double check later
+                    selected_trace = utils.select_trace(synthetic_path)
+                    request_packet = utils.capture_requests(synthetic_path, selected_trace)
                     synthetic_packet_latency_freq = latency_analysis.capture_packet_latency(request_packet)
-                    packet_latency_hellinger = latency_analysis.compare_packet_latency(fullsystem_path, synthetic_packet_latency_freq, output_path)
-                    packet_latency_string += str(packet_latency_hellinger)
+                    packet_lat_hellinger = latency_analysis.compare_packet_latency(fullsystem_path, synthetic_packet_latency_freq, output_path)
+                    packet_latency_string += str(packet_lat_hellinger)
                 packet_latency_hellinger.append(packet_latency_string)
     with open(benchlist.path + "packet_latency_hellinger.csv", "w") as file:
         for string in packet_latency_hellinger:
             file.write(string)
-
+    print("packet latency analysis finished")"""
     ########################################-relative/absolute average latency/throughput-######################################
     absolute_throughput_err = [",,,NVLink1,NVLink2,NVLink3,NVLink4"]
     absolute_packet_latency_err = [",,,NVLink1,NVLink2,NVLink3,NVLink4"]
@@ -165,3 +167,4 @@ if __name__ == "__main__":
     with open(benchlist.path + "relative_network_latency", "w") as file:
         for item in relative_network_latency:
             file.write(item)
+    print("throughput/latency analysis finished")

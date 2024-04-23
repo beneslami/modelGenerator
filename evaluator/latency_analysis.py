@@ -13,17 +13,17 @@ def capture_packet_latency(request_packet):
     for id, packet in trace.items():
         start = 0
         for step in packet:
-            if packet.split("\t")[0] == "request injected":
+            if step.split("\t")[0] == "request injected":
                 start = int(step.split("\t")[5].split(": ")[1])
-            elif packet.split("\t")[0] == "request received" and start != 0:
+            elif step.split("\t")[0] == "request received" and start != 0:
                 if int(step.split("\t")[5].split(": ")[1]) - start not in latency.keys():
                     latency[int(step.split("\t")[5].split(": ")[1]) - start] = 1
                 else:
                     latency[int(step.split("\t")[5].split(": ")[1]) - start] += 1
                 start = 0
-            if packet.split("\t")[0] == "reply injected":
+            if step.split("\t")[0] == "reply injected":
                 start = int(step.split("\t")[5].split(": ")[1])
-            elif packet.split("\t")[0] == "reply received" and start != 0:
+            elif step.split("\t")[0] == "reply received" and start != 0:
                 if int(step.split("\t")[5].split(": ")[1]) - start not in latency.keys():
                     latency[int(step.split("\t")[5].split(": ")[1]) - start] = 1
                 else:

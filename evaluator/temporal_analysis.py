@@ -24,8 +24,8 @@ def compare_iat(iat, bench_path):
     plt.tight_layout()
     plt.savefig(bench_path + "iat_CDF.jpg")
     plt.close()
-    syn_hurst = utils.compute_hurst(cmp_cdf["synthetic"])
-    ful_hurst = utils.compute_hurst(cmp_cdf["real"])
+    syn_hurst = utils.compute_hurst(iat["synthetic"])
+    ful_hurst = utils.compute_hurst(iat["real"])
     return utils.measure_hellinger(cmp_cdf["synthetic"], cmp_cdf["real"]), utils.measure_MAE(cmp_cdf["synthetic"], cmp_cdf["real"]), (np.abs(syn_hurst - ful_hurst))
 
 
@@ -43,8 +43,8 @@ def compare_intensity(intensity, bench_path):
     plt.tight_layout()
     plt.savefig(bench_path + "burst_intensity_CDF.jpg")
     plt.close()
-    syn_hurst = utils.compute_hurst(cmp_cdf["synthetic"])
-    ful_hurst = utils.compute_hurst(cmp_cdf["real"])
+    syn_hurst = utils.compute_hurst(intensity["synthetic"])
+    ful_hurst = utils.compute_hurst(intensity["real"])
     return utils.measure_hellinger(cmp_cdf["synthetic"], cmp_cdf["real"]), utils.measure_MAE(cmp_cdf["synthetic"], cmp_cdf["real"]), np.abs(syn_hurst - ful_hurst)
 
 
@@ -63,11 +63,54 @@ def compare_autocorrelation(iat, bench_path, string):
     return utils.measure_cosine_similarity(vals["synthetic"], vals["real"]), utils.measure_euclidean(vals["synthetic"], vals["real"])
 
 
+def capture_burst(synthetic_path):
+    selected_trace = utils.select_trace(synthetic_path)
+    with open(synthetic_path + selected_trace, "r") as file:
+        content = file.readlines()
+    trace = {}
+    iat = []
+    burst = []
+    combo = []
+    for packet in content:
+        if packet.split("\t")[0] == "request injected":
+            if int(packet.split("\t")[5].split(": ")[1]) not in trace.keys():
+                trace[int(packet.split("\t")[5].split(": ")[1])] = int(packet.split("\t")[7].split(": ")[1])
+            else:
+                trace[int(packet.split("\t")[5].split(": ")[1])] += int(packet.split("\t")[7].split(": ")[1])
+    prev_off = int(list(trace.keys())[0])
+    prev_on = int(list(trace.keys())[0])
+    volume = 0
+    for cycle, byte in trace.items():
+        if cycle - prev_off > 1:
+            if prev_on == prev_off:
+                burst_duration = 1
+            else:
+                burst_duration = prev_off - prev_on
+            iat.append(cycle - prev_off - 1)
+            burst.append(volume / burst_duration)
+            combo.append(volume / burst_duration)
+            combo.append(cycle - prev_off - 1)
+            volume = byte
+            prev_on = cycle
+            prev_off = cycle
+        else:
+            prev_off = cycle
+            volume += byte
+    with open(synthetic_path + "iat_sequence.txt", "w") as file:
+        for num in iat:
+            file.write(str(num) + "\n")
+    with open(synthetic_path + "burst_intensity_sequence.txt", "w") as file:
+        for num in burst:
+            file.write(str(num) + "\n")
+    with open(synthetic_path + "temporal_sequence.txt", "w") as file:
+        for num in combo:
+            file.write(str(num) + "\n")
+
+
 def burst_comparison(fullsystem_path, synthetic_path, save_path):
     iat = {"real": [], "synthetic": []}
     intensity = {"real": [], "synthetic": []}
     temporal = {"real": [], "synthetic": []}
-    print(fullsystem_path)
     for file_n in ["iat", "intensity", "temporal"]:
         syn_content = []
         real_content = []

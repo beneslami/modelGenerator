@@ -1,3 +1,5 @@
+import os
+
 import numpy
 import statsmodels.api as sm
 from hurst import compute_Hc
@@ -125,3 +127,14 @@ def compute_hurst(data):
     except ValueError:
         H = -1
     return H
+
+
+def select_trace(file_path):
+    max = 0
+    selection = ""
+    for item in os.listdir(file_path):
+        if "trace" in item:
+            if os.stat(file_path + item).st_size > max:
+                max = os.stat(file_path + item).st_size
+                selection = item
+    return selection
