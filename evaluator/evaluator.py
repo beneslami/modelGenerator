@@ -21,14 +21,12 @@ if __name__ == "__main__":
                     fullsystem_path = benchlist.path + suite + "/" + bench + "/ring/" + nv + "/4chiplet/data/fullsystem/" + str(kernel) + "/"
                     synthetic_path = benchlist.path + suite + "/" + bench + "/ring/" + nv + "/4chiplet/data/synthetic/" + LEVEL + "/" + str(kernel) + "/"
                     output_path = benchlist.path + suite + "/" + bench + "/ring/" + nv + "/4chiplet/output/" + LEVEL + "/" + str(kernel) + "/"
-                    if not os.path.exists(synthetic_path):
-                        os.makedirs(synthetic_path)
                     if not os.path.exists(output_path):
                         os.makedirs(output_path)
                     hell_iat, mae_iat, hurst_iat, hell_int, mae_int, hurst_int = temporal_analysis.burst_comparison(fullsystem_path, synthetic_path, output_path)
                     burst_string = suite + "," + bench + "," + str(kernel) + "," + str(hell_int) + "," + str(mae_int) + "," + str(hurst_iat) + "," + str(hell_int) + "," + str(mae_int) + "," + str(hurst_int)
                     burst_comparison_out.append(burst_string)
-        with open(benchlist.path + "burst_analysis_" + nv + ".scv", "w") as file:
+        with open(benchlist.path + "burst_analysis_" + nv + ".csv", "w") as file:
             for string in burst_comparison_out:
                 file.write(string)
 
@@ -47,18 +45,12 @@ if __name__ == "__main__":
                         kernel) + "/"
                     output_path = benchlist.path + suite + "/" + bench + "/ring/" + nv + "/4chiplet/output/" + LEVEL + "/" + str(
                         kernel) + "/"
-                    if not os.path.exists(synthetic_path):
-                        os.makedirs(synthetic_path)
-                    if not os.path.exists(output_path):
-                        os.makedirs(output_path)
                     request_packet = utils.capture_requests(synthetic_path, "trace_0.txt")  # TODO: double check later
                     synthetic_packet_latency_freq = latency_analysis.capture_packet_latency(request_packet)
                     packet_latency_hellinger = latency_analysis.compare_packet_latency(fullsystem_path, synthetic_packet_latency_freq, output_path)
                     packet_latency_string += str(packet_latency_hellinger)
-                    if nv != "NVLink1":
-                        packet_latency_string += ","
                 packet_latency_hellinger.append(packet_latency_string)
-    with open(benchlist.path + "packet_latency_hellinger.scv", "w") as file:
+    with open(benchlist.path + "packet_latency_hellinger.csv", "w") as file:
         for string in packet_latency_hellinger:
             file.write(string)
 

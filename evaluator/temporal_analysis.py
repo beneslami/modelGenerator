@@ -67,7 +67,7 @@ def burst_comparison(fullsystem_path, synthetic_path, save_path):
     iat = {"real": [], "synthetic": []}
     intensity = {"real": [], "synthetic": []}
     temporal = {"real": [], "synthetic": []}
-
+    print(fullsystem_path)
     for file_n in ["iat", "intensity", "temporal"]:
         syn_content = []
         real_content = []
@@ -77,8 +77,8 @@ def burst_comparison(fullsystem_path, synthetic_path, save_path):
                     syn_content = list_file.readlines()
         for f in os.listdir(fullsystem_path):
             if file_n in f and f.split(".")[1] == "txt":
-                with open(fullsystem_path + f, "r") as list_file:
-                    real_content = list_file.readlines()
+                with open(fullsystem_path + f, "r") as list_file2:
+                    real_content = list_file2.readlines()
         if file_n == "iat":
             for line in syn_content:
                 iat["synthetic"].append(int(line.split("\n")[0]))
