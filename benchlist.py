@@ -65,3 +65,5 @@ kernels_list = {
                  "color-maxmin": [10]
                  },
 }
+
+NVLinks = ["NVLink1"]#, "NVLink2", "NVLink3", "NVLink4"]

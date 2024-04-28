@@ -41,8 +41,8 @@ def compare_packet_latency(fullsystem_path, synthetic_packet_latency_freq, outpu
         real_packet_latency_freq[int(item.split(",")[0])] = int(item.split(",")[1])
     _, real_cdf = utils.generate_pdf_cdf(real_packet_latency_freq)
     _, synt_cdf = utils.generate_pdf_cdf(synthetic_packet_latency_freq)
-    plt.plot(real_cdf.keys(), real_cdf.values(), label="AccelSim")
-    plt.plot(synt_cdf.keys(), synt_cdf.values(), label="AccelSim")
+    plt.plot(real_cdf.keys(), real_cdf.values(), label="real")
+    plt.plot(synt_cdf.keys(), synt_cdf.values(), label="Synthetic")
     plt.legend()
     plt.title("packet latency CDF")
     plt.tight_layout()
@@ -57,12 +57,44 @@ def capture_network_latency(fullsystem_path, synthetic_packet_latency_freq, outp
 
 
 def collect_packet_latency(fullsystem_path, synthetic_path):
-    real = 0.0
-    syn = 0.0
+    real = ""
+    syn = ""
+    with open(fullsystem_path, "r") as file:
+        content = file.readlines()
+    for item in content:
+        if item.split(",")[0] == "average packet latency":
+            real = item.split(",")[1].split("\n")[0]
+            break
+    with open(synthetic_path, "r") as file:
+        content = file.readlines()
+    flag = 0
+    for item in content:
+        if "====== Traffic class 0 ======" in item:
+            flag = 1
+        if flag == 1:
+            if item.split(" = ")[0] == "Packet latency average":
+                syn = item.split(" = ")[1].split(" (")[0].split("\n")[0]
+                break
     return real, syn
 
 
 def collect_network_latency(fullsystem_path, synthetic_path):
-    real = 0.0
-    syn = 0.0
+    real = ""
+    syn = ""
+    with open(fullsystem_path, "r") as file:
+        content = file.readlines()
+    for item in content:
+        if item.split(",")[0] == "average network latency":
+            real = item.split(",")[1].split("\n")[0]
+            break
+    with open(synthetic_path, "r") as file:
+        content = file.readlines()
+    flag = 0
+    for item in content:
+        if "====== Traffic class 0 ======" in item:
+            flag = 1
+        if flag == 1:
+            if item.split(" = ")[0] == "Network latency average":
+                syn = item.split(" = ")[1].split(" (")[0].split("\n")[0]
+                break
     return real, syn
