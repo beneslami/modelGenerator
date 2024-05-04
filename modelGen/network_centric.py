@@ -313,7 +313,7 @@ def generate_network_centric_model(request_packet, level):
     elif level == "level3":
         cycle, iat, burst_duration, burst_volume = generate_temporal_burst_level3(request_packet)
 
-    if level == "level1" or level == "level2":
+    if level == "level1":
         data.setdefault("cycle", {})
         data["cycle"] = cycle
         data.setdefault("temporal", {}).setdefault("iat", {})
@@ -339,6 +339,7 @@ def generate_network_centric_model(request_packet, level):
         for src in latency.keys():
             per_core[src]["latency"] = latency[src]
         data["spatial"]["chip"] = per_core
+        data["spatial"].setdefault("reply_window", {})
         data["spatial"]["reply_window"] = reply_window
     elif level == "level3":
         data.setdefault("cycle", {})

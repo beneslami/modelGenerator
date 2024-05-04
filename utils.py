@@ -1,5 +1,4 @@
 import os
-
 import numpy
 import statsmodels.api as sm
 from hurst import compute_Hc
