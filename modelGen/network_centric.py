@@ -101,8 +101,8 @@ def generate_spatial_burst_level1(request_packet):
             else:
                 reply_trace[cyc] += 1
         elif packet.split("\t")[0] == "reply received":
-            src = int(packet.split("\t")[1].split(": ")[1])
-            dst = int(packet.split("\t")[2].split(": ")[1])
+            src = int(packet.split("\t")[2].split(": ")[1])
+            dst = int(packet.split("\t")[1].split(": ")[1])
             sze = int(packet.split("\t")[7].split(": ")[1])
             if src not in reply_packet_type.keys():
                 reply_packet_type.setdefault(src, {}).setdefault(dst, {})[sze] = 1
