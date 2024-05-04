@@ -36,7 +36,7 @@ if __name__ == "__main__":
     #######################################-packet latency difference (hellinger)-######################################
     packet_latency_hellinger = [",,,Hellinger distance for packet latency distribution,Hellinger distance for packet "
                                 "latency distribution,Hellinger distance for packet latency distribution,Hellinger "
-                                "distance for packet latency distribution\n", "suite,benchmark,kernel,NVLink1,NVLink2,NVLink3,NVLink4"]
+                                "distance for packet latency distribution", "suite,benchmark,kernel,NVLink1,NVLink2,NVLink3,NVLink4"]
     for suite in benchlist.kernels_list.keys():
         for bench, k_list in benchlist.kernels_list[suite].items():
             for kernel in k_list:
@@ -52,11 +52,11 @@ if __name__ == "__main__":
                     request_packet = utils.capture_requests(synthetic_path, selected_trace)
                     synthetic_packet_latency_freq = latency_analysis.capture_packet_latency(request_packet)
                     packet_lat_hellinger = latency_analysis.compare_packet_latency(fullsystem_path, synthetic_packet_latency_freq, output_path)
-                    packet_latency_string += str(packet_lat_hellinger)
+                    packet_latency_string += str(packet_lat_hellinger) + ","
                 packet_latency_hellinger.append(packet_latency_string)
     with open(benchlist.path + "OUTPUTS/" + LEVEL + "/packet_latency_hellinger.csv", "w") as file:
         for string in packet_latency_hellinger:
-            file.write(string)
+            file.write(string + "\n")
     print("packet latency analysis finished")
     ########################################-relative/absolute average latency/throughput-######################################
     absolute_throughput_err = ["suite,benchmark,kernel,NVLink1,NVLink2,NVLink3,NVLink4"]

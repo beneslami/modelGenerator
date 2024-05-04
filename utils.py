@@ -109,8 +109,14 @@ def generate_pdf_cdf(item):
 def generate_autocorrelation(data):
     minimum = len(data["real"]) if len(data["real"]) < len(data["synthetic"]) else len(data["synthetic"])
     val = {}
-    val["real"] = sm.tsa.acf(data["real"][:minimum], nlags=minimum)
-    val["synthetic"] = sm.tsa.acf(data["synthetic"][:minimum], nlags=minimum)
+    try:
+        val["real"] = sm.tsa.acf(data["real"][:minimum], nlags=minimum)
+    except FloatingPointError:
+        val["real"] = [-1]
+    try:
+        val["synthetic"] = sm.tsa.acf(data["synthetic"][:minimum], nlags=minimum)
+    except FloatingPointError:
+        val["real"] = [-1]
     result = {"real": {}, "synthetic": {}}
     i = 1
     for tp in val.keys():
@@ -123,8 +129,10 @@ def generate_autocorrelation(data):
 
 def compute_hurst(data):
     try:
-        H, c, _ = compute_Hc(data, kind='random_walk', simplified=True)
+        H, c, _ = compute_Hc(data, kind='price', simplified=True)
     except ValueError:
+        H = -1
+    except FloatingPointError:
         H = -1
     return H
 
