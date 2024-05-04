@@ -341,6 +341,7 @@ def generate_network_centric_model(request_packet, level):
         data["spatial"]["chip"] = per_core
         data["spatial"].setdefault("reply_window", {})
         data["spatial"]["reply_window"] = reply_window
+        print(data["spatial"]["reply_window"])
     elif level == "level3":
         data.setdefault("cycle", {})
         data["cycle"] = cycle
