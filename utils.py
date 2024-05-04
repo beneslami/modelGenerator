@@ -5,8 +5,8 @@ import statsmodels.api as sm
 from hurst import compute_Hc
 
 
-def capture_requests(path, file_name):
-    with open(path + file_name, "r") as file:
+def capture_requests(file_name):
+    with open(file_name, "r") as file:
         raw_content = file.readlines()
     request_packet = []
     for line in raw_content:
