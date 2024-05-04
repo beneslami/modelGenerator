@@ -62,6 +62,8 @@ def generate_spatial_burst_level1(request_packet):
     source = {}
     destination = {}
     packet_type = {}
+    reply_window = {}
+    reply_trace = {}
     for packet in request_packet:
         if packet.split("\t")[0] == "request injected":
             src = int(packet.split("\t")[1].split(": ")[1])
@@ -88,6 +90,20 @@ def generate_spatial_burst_level1(request_packet):
                         packet_type[src][dst][sze] = 1
                     else:
                         packet_type[src][dst][sze] += 1
+        elif packet.split("\t")[0] == "reply injected":
+            src = int(packet.split("\t")[1].split(": ")[1])
+            dst = int(packet.split("\t")[2].split(": ")[1])
+            cyc = int(packet.split("\t")[5].split(": ")[1])
+            sze = int(packet.split("\t")[7].split(": ")[1])
+            if cyc not in reply_trace.keys():
+                reply_trace[cyc] = 1
+            else:
+                reply_trace[cyc] += 1
+    for k, v in reply_trace.items():
+        if v not in reply_window.keys():
+            reply_window[v] = 1
+        else:
+            reply_window[v] += 1
     source = dict(sorted(source.items(), key=lambda x: x[0]))
     destination = dict(sorted(destination.items(), key=lambda x: x[0]))
     for src in destination.keys():
@@ -97,7 +113,8 @@ def generate_spatial_burst_level1(request_packet):
         packet_type[src] = dict(sorted(packet_type[src].items(), key=lambda x: x[0]))
         for dst in packet_type[src].keys():
             packet_type[src][dst] = dict(sorted(packet_type[src][dst].items(), key=lambda x: x[0]))
-    return source, destination, packet_type
+    reply_window = dict(sorted(reply_window.items(), key=lambda x: x[0]))
+    return source, destination, packet_type, reply_window
 
 
 def generate_temporal_burst_level2(request_packet):
@@ -286,9 +303,10 @@ def generate_network_centric_model(request_packet, level):
     destination = {}
     packet_type = {}
     latency = {}
+    reply_window = {}
     if level == "level1":
         cycle, iat, burst = generate_temporal_burst_level1(request_packet)
-        source, destination, packet_type = generate_spatial_burst_level1(request_packet)
+        source, destination, packet_type, reply_window = generate_spatial_burst_level1(request_packet)
         latency = generate_memory_latency(request_packet)
     elif level == "level2":
         cycle, iat, burst = generate_temporal_burst_level2(request_packet)
@@ -321,6 +339,7 @@ def generate_network_centric_model(request_packet, level):
         for src in latency.keys():
             per_core[src]["latency"] = latency[src]
         data["spatial"]["chip"] = per_core
+        data["spatial"]["reply_window"] = reply_window
     elif level == "level3":
         data.setdefault("cycle", {})
         data["cycle"] = cycle
