@@ -1,4 +1,3 @@
-
 def generate_temporal_burst_level1(request_packet):
     """
     This is the first level of temporal burstiness statistics capturing.
@@ -63,6 +62,8 @@ def generate_spatial_burst_level1(request_packet):
     destination = {}
     request_packet_type = {}
     reply_packet_type = {}
+    request_window = {}
+    request_trace = {}
     reply_window = {}
     reply_trace = {}
     for packet in request_packet:
@@ -70,6 +71,11 @@ def generate_spatial_burst_level1(request_packet):
             src = int(packet.split("\t")[1].split(": ")[1])
             dst = int(packet.split("\t")[2].split(": ")[1])
             sze = int(packet.split("\t")[7].split(": ")[1])
+            cyc = int(packet.split("\t")[5].split(": ")[1])
+            if cyc not in request_trace.keys():
+                request_trace[cyc] = 1
+            else:
+                request_trace[cyc] += 1
             if src not in source.keys():
                 source[src] = 1
             else:
@@ -114,6 +120,11 @@ def generate_spatial_burst_level1(request_packet):
                         reply_packet_type[src][dst][sze] = 1
                     else:
                         reply_packet_type[src][dst][sze] += 1
+    for k, v in request_trace.items():
+        if v not in request_window.keys():
+            request_window[v] = 1
+        else:
+            request_window[v] += 1
     for k, v in reply_trace.items():
         if v not in reply_window.keys():
             reply_window[v] = 1
@@ -133,8 +144,9 @@ def generate_spatial_burst_level1(request_packet):
         reply_packet_type[src] = dict(sorted(reply_packet_type[src].items(), key=lambda x: x[0]))
         for dst in reply_packet_type[src].keys():
             reply_packet_type[src][dst] = dict(sorted(reply_packet_type[src][dst].items(), key=lambda x: x[0]))
+    request_window = dict(sorted(request_window.items(), key=lambda x: x[0]))
     reply_window = dict(sorted(reply_window.items(), key=lambda x: x[0]))
-    return source, destination, request_packet_type, reply_packet_type, reply_window
+    return source, destination, request_packet_type, reply_packet_type, request_window, reply_window
 
 
 def generate_temporal_burst_level2(request_packet):
@@ -323,11 +335,12 @@ def generate_network_centric_model(request_packet, level):
     destination = {}
     request_packet_type = {}
     reply_packet_type = {}
+    request_window = {}
     latency = {}
     reply_window = {}
     if level == "level1":
         cycle, iat, burst = generate_temporal_burst_level1(request_packet)
-        source, destination, request_packet_type, reply_packet_type, reply_window = generate_spatial_burst_level1(request_packet)
+        source, destination, request_packet_type, reply_packet_type, request_window, reply_window = generate_spatial_burst_level1(request_packet)
         latency = generate_memory_latency(request_packet)
     elif level == "level2":
         cycle, iat, burst = generate_temporal_burst_level2(request_packet)
@@ -346,11 +359,16 @@ def generate_network_centric_model(request_packet, level):
         data["temporal"].setdefault("volume", {})
         for dur, volume in burst.items():
             data["temporal"]["volume"][dur] = volume
-        data.setdefault("spatial", {}).setdefault("source", {})
+        data.setdefault("spatial", {}).setdefault("request_window", {})
+        data["spatial"]["request_window"] = request_window
+        #data.setdefault("spatial", {}).setdefault("source", {})
         data["spatial"]["source"] = source
         data["spatial"].setdefault("chip", {})
         per_core = {}
         for src in destination.keys():
+            if src not in per_core.keys():
+                per_core.setdefault(src, {})
+        for src in source.keys():
             if src not in per_core.keys():
                 per_core.setdefault(src, {})
         for src in destination.keys():
@@ -358,6 +376,8 @@ def generate_network_centric_model(request_packet, level):
         for src in request_packet_type.keys():
             per_core[src]["request_packet"] = request_packet_type[src]
         for src in reply_packet_type.keys():
+            if src not in per_core.keys():
+                per_core.setdefault(src, {})
             per_core[src]["reply_packet"] = reply_packet_type[src]
         for src in latency.keys():
             per_core[src]["latency"] = latency[src]
