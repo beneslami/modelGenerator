@@ -29,6 +29,6 @@ def model_gen(suite, bench):
 
 
 if __name__ == "__main__":
-    suite = sys.argv[1]
-    bench = sys.argv[2]
-    model_gen(suite, bench)
+    for suite in benchlist.kernels_list.keys():
+        for bench in benchlist.kernels_list[suite].keys():
+            model_gen(suite, bench)
