@@ -106,20 +106,16 @@ def generate_spatial_burst_level1(request_packet):
                 reply_trace[cyc] = 1
             else:
                 reply_trace[cyc] += 1
-        elif packet.split("\t")[0] == "reply received":
-            src = int(packet.split("\t")[2].split(": ")[1])
-            dst = int(packet.split("\t")[1].split(": ")[1])
-            sze = int(packet.split("\t")[7].split(": ")[1])
-            if src not in reply_packet_type.keys():
-                reply_packet_type.setdefault(src, {}).setdefault(dst, {})[sze] = 1
+            if dst not in reply_packet_type.keys():
+                reply_packet_type.setdefault(dst, {}).setdefault(src, {})[sze] = 1
             else:
-                if dst not in reply_packet_type[src].keys():
-                    reply_packet_type[src].setdefault(dst, {})[sze] = 1
+                if src not in reply_packet_type[dst].keys():
+                    reply_packet_type[dst].setdefault(src, {})[sze] = 1
                 else:
-                    if sze not in reply_packet_type[src][dst].keys():
-                        reply_packet_type[src][dst][sze] = 1
+                    if sze not in reply_packet_type[dst][src].keys():
+                        reply_packet_type[dst][src][sze] = 1
                     else:
-                        reply_packet_type[src][dst][sze] += 1
+                        reply_packet_type[dst][src][sze] += 1
     for k, v in request_trace.items():
         if v not in request_window.keys():
             request_window[v] = 1

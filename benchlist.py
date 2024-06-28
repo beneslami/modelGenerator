@@ -46,21 +46,21 @@ kernels_list_original = {
 }
 
 kernels_list = {
-            "shoc": {
-		"FFT": [3]
-             },
-             "UVM": {
-                "lr": [1, 3, 6, 8, 11, 13]
-            },
-            "tango": {
-		"AlexNet": [1]
-	    },
-            "pannotia": {
-		"color-max": [1]
-	    },
-	    "rodinia": {
-		"b+tree": [1, 2]
-  	    }
-        }
+    "shoc": {
+        "FFT": [3]
+    },
+    "UVM": {
+        "lr": [1, 3, 6, 8, 11, 13]
+    },
+    "tango": {
+        "AlexNet": [1]
+    },
+    "pannotia": {
+        "color-max": [1]
+    },
+    "rodinia": {
+        "b+tree": [1, 2]
+    }
+}
 
 NVLinks = ["NVLink1", "NVLink2", "NVLink3", "NVLink4"]
