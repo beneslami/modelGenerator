@@ -94,7 +94,7 @@ if __name__ == "__main__":
                     fullsystem_path = benchlist.model_eval_path + suite + "/" + bench + "/ring/" + nv + "/4chiplet/data/fullsystem/" + str(kernel) + "/accelsim.csv"
                     synthetic_path = benchlist.model_eval_path + suite + "/" + bench + "/ring/" + nv + "/4chiplet/data/synthetic/" + LEVEL + "/" + str(kernel) + "/bookSim_output.txt"
                     output_path = benchlist.model_eval_path + suite + "/" + bench + "/ring/" + nv + "/4chiplet/output/" + LEVEL + "/" + str(kernel) + "/"
-                    real_thr, synthetic_thr = throughput_analysis.collect_throughput(fullsystem_path, synthetic_path)
+                    real_thr, synthetic_thr = throughput_analysis.collect_throughput(fullsystem_path, synthetic_path, nv)
                     abs_thr_string += str(real_thr) + ","
                     abs_thr_string_syn += str(synthetic_thr) + ","
                     real_plat, synthetic_plat = latency_analysis.collect_packet_latency(fullsystem_path, synthetic_path)
