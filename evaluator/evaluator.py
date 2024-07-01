@@ -15,8 +15,7 @@ if __name__ == "__main__":
         os.makedirs(benchlist.model_eval_path + "OUTPUTS/" + LEVEL)
     ######################################-burst analysis-#######################################
     for nv in benchlist.NVLinks:
-        burst_comparison_out = [",,,IAT,IAT,IAT,Burst_int,Burst_int,Burst_int",
-                                "suite,benchmark,kernel,hellinger,MAE,hurst,hellinger,MAE,hurst"]
+        burst_comparison_out = [",,,IAT,IAT,IAT,Burst_int,Burst_int,Burst_int", "suite,benchmark,kernel,hellinger,MAE,hurst,hellinger,MAE,hurst"]
         for suite in benchlist.kernels_list.keys():
             for bench, k_list in benchlist.kernels_list[suite].items():
                 for kernel in k_list:
@@ -42,16 +41,13 @@ if __name__ == "__main__":
             for kernel in k_list:
                 packet_latency_string = suite + "," + bench + "," + str(kernel) + ","
                 for nv in benchlist.NVLinks:
-                    fullsystem_path = benchlist.model_eval_path + suite + "/" + bench + "/ring/" + nv + "/4chiplet/data/fullsystem/" + str(
-                        kernel) + "/"
-                    synthetic_path = benchlist.model_eval_path + suite + "/" + bench + "/ring/" + nv + "/4chiplet/data/synthetic/" + LEVEL + "/" + str(
-                        kernel) + "/"
-                    output_path = benchlist.model_eval_path + suite + "/" + bench + "/ring/" + nv + "/4chiplet/output/" + LEVEL + "/" + str(
-                        kernel) + "/"
+                    fullsystem_path = benchlist.model_eval_path + suite + "/" + bench + "/ring/" + nv + "/4chiplet/data/fullsystem/" + str(kernel) + "/"
+                    synthetic_path  = benchlist.model_eval_path + suite + "/" + bench + "/ring/" + nv + "/4chiplet/data/synthetic/" + LEVEL + "/" + str(kernel) + "/"
+                    output_path     = benchlist.model_eval_path + suite + "/" + bench + "/ring/" + nv + "/4chiplet/output/" + LEVEL + "/" + str(kernel) + "/"
                     selected_trace = utils.select_trace(synthetic_path)
                     request_packet = utils.capture_requests(synthetic_path + selected_trace)
                     synthetic_packet_latency_freq = latency_analysis.capture_packet_latency(request_packet)
-                    packet_lat_hellinger = latency_analysis.compare_packet_latency(fullsystem_path, synthetic_packet_latency_freq, output_path)
+                    packet_lat_hellinger          = latency_analysis.compare_packet_latency(fullsystem_path, synthetic_packet_latency_freq, output_path)
                     packet_latency_string += str(packet_lat_hellinger) + ","
                 packet_latency_hellinger.append(packet_latency_string)
     with open(benchlist.model_eval_path + "OUTPUTS/" + LEVEL + "/packet_latency_hellinger.csv", "w") as file:

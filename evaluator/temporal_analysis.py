@@ -140,8 +140,8 @@ def burst_comparison(fullsystem_path, synthetic_path, save_path):
     hell_iat, mae_iat, hurst_iat = compare_iat(iat, save_path)
     hell_int, mae_int, hurst_int = compare_intensity(intensity, save_path)
 
-    #c_tmp, euc_tmp = compare_autocorrelation(temporal, save_path, "temporal")
-    #c_iat, euc_iat = compare_autocorrelation(iat, save_path, "iat")
-    #c_int, euc_int = compare_autocorrelation(intensity, save_path, "intensity")
+    c_tmp, euc_tmp = compare_autocorrelation(temporal, save_path, "temporal")
+    c_iat, euc_iat = compare_autocorrelation(iat, save_path, "iat")
+    c_int, euc_int = compare_autocorrelation(intensity, save_path, "intensity")
 
     return hell_iat, mae_iat, hurst_iat, hell_int, mae_int, hurst_int
