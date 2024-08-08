@@ -14,29 +14,29 @@ def capture_requests(file_name):
     return request_packet
 
 
+def extend_distribution(dist, keys):
+    """Extend a distribution to include all keys, setting missing keys to 0."""
+    extended_dist = {key: dist.get(key, 0) for key in keys}
+    return extended_dist
+
+
 def equate_dictionaries(p, q):
-    for k, v in p.items():
-        if k not in q.keys():
-            q[k] = v
-    for k, v in q.items():
-        if k not in p.keys():
-            p[k] = v
-    p = dict(sorted(p.items(), key=lambda x: x[0]))
-    q = dict(sorted(q.items(), key=lambda x: x[0]))
-    return p, q
+    common_keys = set(p.keys()).intersection(q.keys())
+    # Extend both distributions
+    p = extend_distribution(p, common_keys)
+    q = extend_distribution(q, common_keys)
+    return p, q, common_keys
 
 
 def measure_hellinger(p, q):
-    new_p, new_q = equate_dictionaries(p, q)
-    partial_sum = 0
-    for i in new_p.keys():
-        partial_sum += (numpy.sqrt(new_p[i]) - numpy.sqrt(new_q[i]))**2
+    new_p, new_q, common_keys = equate_dictionaries(p, q)
+    partial_sum = sum((numpy.sqrt(new_p[key]) - numpy.sqrt(new_q[key]))**2 for key in common_keys)
     hellinger = (1/numpy.sqrt(2))*(numpy.sqrt(partial_sum))
     return hellinger
 
 
 def measure_euclidean(p, q):
-    new_p, new_q = equate_dictionaries(p, q)
+    new_p, new_q, _ = equate_dictionaries(p, q)
     partial_sum = 0
     for i in new_p.keys():
         partial_sum += (new_p[i] - new_q[i])**2
@@ -45,7 +45,7 @@ def measure_euclidean(p, q):
 
 
 def measure_manhattan(p, q):
-    new_p, new_q = equate_dictionaries(p, q)
+    new_p, new_q, _ = equate_dictionaries(p, q)
     partial_sum = 0
     for i in new_p.keys():
         partial_sum += numpy.abs(new_p[i] - new_q[i])
@@ -54,7 +54,7 @@ def measure_manhattan(p, q):
 
 
 def measure_cosine_similarity(p, q):
-    new_p, new_q = equate_dictionaries(p, q)
+    new_p, new_q, _ = equate_dictionaries(p, q)
     partial_sum = 0
     for i in new_p.keys():
         partial_sum += new_p[i]*new_q[i]
@@ -69,20 +69,20 @@ def measure_cosine_similarity(p, q):
 
 
 def measure_MAE(p, q):
-    new_p, new_q = equate_dictionaries(p, q)
+    new_p, new_q, common_keys = equate_dictionaries(p, q)
     partial_sum = 0
     for i in new_p.keys():
         partial_sum += numpy.abs(new_p[i] - new_q[i])
-    MAE = partial_sum / len(new_p)
+    MAE = partial_sum / len(common_keys)
     return MAE
 
 
 def measure_MSE(p, q):
-    new_p, new_q = equate_dictionaries(p, q)
+    new_p, new_q, common_keys = equate_dictionaries(p, q)
     partial_sum = 0
     for i in new_p.keys():
         partial_sum += (new_p[i] - new_q[i])**2
-    MSE = (1/len(new_p))*(partial_sum)
+    MSE = (1/len(common_keys))*(partial_sum)
     return MSE
 
 
@@ -102,6 +102,8 @@ def generate_pdf_cdf(item):
     for k, v in pdf_data.items():
         prev += v
         cdf_data[k] = prev
+    pdf_data = dict(sorted(pdf_data.items(), key=lambda x: x[0]))
+    cdf_data = dict(sorted(cdf_data.items(), key=lambda x: x[0]))
     return pdf_data, cdf_data
 
 

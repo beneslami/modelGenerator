@@ -7,6 +7,7 @@ import numpy as np
 import temporal_analysis
 import latency_analysis
 import throughput_analysis
+import simulation_time
 
 
 if __name__ == "__main__":
@@ -172,3 +173,11 @@ if __name__ == "__main__":
         for item in relative_network_latency:
             file.write(item + "\n")
     print("throughput/latency analysis finished")
+    ########################################-simulation time-######################################
+    for suite in benchlist.kernels_list.keys():
+        for bench, k_list in benchlist.kernels_list[suite].items():
+            for kernel in k_list:
+                for nv in benchlist.NVLinks:
+                    fullsystem_path = benchlist.model_eval_path + suite + "/" + bench + "/ring/" + nv + "/4chiplet/data/fullsystem/" + str(kernel) + "/accelsim.csv"
+                    synthetic_path = benchlist.model_eval_path + suite + "/" + bench + "/ring/" + nv + "/4chiplet/data/synthetic/" + LEVEL + "/" + str(kernel) + "/bookSim_output.txt"
+                    real_sim, syn_sim = simulation_time.capture_simulation_time(fullsystem_path, synthetic_path)

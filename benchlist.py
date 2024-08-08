@@ -30,7 +30,7 @@ kernels_list_original = {
                   },
     "rodinia": {"b+tree": [1],
                 "bt": [1, 2],
-                "cfd": [3],
+                "cfd": [5],
                 "gaussian": [2, 4, 6],
                 "hybridsort": [4, 5, 6, 7, 8, 9, 10],
                 "lud": [3, 6, 9]
@@ -46,18 +46,18 @@ kernels_list_original = {
 }
 
 kernels_list = {
-    #"shoc": {
-        #"FFT": [3]
-    #},
-    #"UVM": {
-        #"lr": [1, 3, 6, 8, 11, 13]
-    #},
-    #"tango": {
-        #"AlexNet": [1]
-    #},
-    #"pannotia": {
-        #"color-max": [1]
-    #},
+    "shoc": {
+        "FFT": [3]
+    },
+    "UVM": {
+        "lr": [1, 3, 6, 8, 11, 13]
+    },
+    "tango": {
+        "AlexNet": [1]
+    },
+    "pannotia": {
+        "color-max": [1]
+    },
     "rodinia": {
         "cfd": [5]
     }

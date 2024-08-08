@@ -39,8 +39,8 @@ def compare_packet_latency(fullsystem_path, synthetic_packet_latency_freq, outpu
         content = file.readlines()
     for item in content:
         real_packet_latency_freq[int(item.split(",")[0])] = int(item.split(",")[1])
-    _, real_cdf = utils.generate_pdf_cdf(real_packet_latency_freq)
-    _, synt_cdf = utils.generate_pdf_cdf(synthetic_packet_latency_freq)
+    real_pdf, real_cdf = utils.generate_pdf_cdf(real_packet_latency_freq)
+    synt_pdf, synt_cdf = utils.generate_pdf_cdf(synthetic_packet_latency_freq)
     plt.plot(real_cdf.keys(), real_cdf.values(), label="real")
     plt.plot(synt_cdf.keys(), synt_cdf.values(), label="Synthetic")
     plt.legend()
@@ -48,7 +48,8 @@ def compare_packet_latency(fullsystem_path, synthetic_packet_latency_freq, outpu
     plt.tight_layout()
     plt.savefig(output_path + "packet_latency_CDF.jpg")
     plt.close()
-    hell = utils.measure_hellinger(real_cdf, synt_cdf)
+    #hell = utils.measure_hellinger(real_cdf, synt_cdf)
+    hell = utils.measure_hellinger(real_pdf, synt_pdf)
     return hell
 
 
@@ -63,7 +64,7 @@ def collect_packet_latency(fullsystem_path, synthetic_path):
         content = file.readlines()
     for item in content:
         if item.split(",")[0] == "average packet latency":
-            real = item.split(",")[1].split("\n")[0]
+            real = float(item.split(",")[1].split("\n")[0])
             break
     with open(synthetic_path, "r") as file:
         content = file.readlines()
@@ -73,7 +74,7 @@ def collect_packet_latency(fullsystem_path, synthetic_path):
             flag = 1
         if flag == 1:
             if item.split(" = ")[0] == "Packet latency average":
-                syn = item.split(" = ")[1].split(" (")[0].split("\n")[0]
+                syn = float(item.split(" = ")[1].split(" (")[0].split("\n")[0])
                 break
     return real, syn
 
@@ -85,7 +86,7 @@ def collect_network_latency(fullsystem_path, synthetic_path):
         content = file.readlines()
     for item in content:
         if item.split(",")[0] == "average network latency":
-            real = item.split(",")[1].split("\n")[0]
+            real = float(item.split(",")[1].split("\n")[0])
             break
     with open(synthetic_path, "r") as file:
         content = file.readlines()
@@ -95,6 +96,6 @@ def collect_network_latency(fullsystem_path, synthetic_path):
             flag = 1
         if flag == 1:
             if item.split(" = ")[0] == "Network latency average":
-                syn = item.split(" = ")[1].split(" (")[0].split("\n")[0]
+                syn = float(item.split(" = ")[1].split(" (")[0].split("\n")[0])
                 break
     return real, syn

@@ -9,13 +9,15 @@ import numpy as np
 
 def compare_iat(iat, bench_path):
     cmp_cdf = {}
+    cmp_pdf = {}
     plt.figure(figsize=(10, 8))
     hurst = {"real": 0, "synthetic": 0}
     for tp in iat.keys():
         hurst[tp] = utils.compute_hurst(iat[tp])
-        _, cdf = utils.generate_pdf_cdf(iat[tp])
+        pdf, cdf = utils.generate_pdf_cdf(iat[tp])
         plt.plot(cdf.keys(), cdf.values(), marker="o", label=tp + "- hurst: " + str("{:.3f}".format(hurst[tp])))
         cmp_cdf[tp] = cdf
+        cmp_pdf[tp] = pdf
         markov.measure_markov_property_wrapper(iat[tp], tp, bench_path)
     plt.legend()
     plt.title("Inter Arrival Time")
@@ -26,16 +28,19 @@ def compare_iat(iat, bench_path):
     plt.close()
     syn_hurst = utils.compute_hurst(iat["synthetic"])
     ful_hurst = utils.compute_hurst(iat["real"])
-    return utils.measure_hellinger(cmp_cdf["synthetic"], cmp_cdf["real"]), utils.measure_MAE(cmp_cdf["synthetic"], cmp_cdf["real"]), (np.abs(syn_hurst - ful_hurst))
+    #return utils.measure_hellinger(cmp_cdf["synthetic"], cmp_cdf["real"]), utils.measure_MAE(cmp_cdf["synthetic"], cmp_cdf["real"]), (np.abs(syn_hurst - ful_hurst))
+    return utils.measure_hellinger(cmp_pdf["synthetic"], cmp_pdf["real"]), utils.measure_MAE(cmp_pdf["synthetic"], cmp_pdf["real"]), (np.abs(syn_hurst - ful_hurst))
 
 
 def compare_intensity(intensity, bench_path):
     cmp_cdf = {}
+    cmp_pdf = {}
     plt.figure(figsize=(10, 8))
     for tp in intensity.keys():
-        _, cdf = utils.generate_pdf_cdf(intensity[tp])
+        pdf, cdf = utils.generate_pdf_cdf(intensity[tp])
         plt.plot(cdf.keys(), cdf.values(), marker="o", label=tp)
         cmp_cdf[tp] = cdf
+        cmp_pdf[tp] = pdf
     plt.legend()
     plt.title("burst Intensity")
     plt.ylabel("CDF")
@@ -45,7 +50,8 @@ def compare_intensity(intensity, bench_path):
     plt.close()
     syn_hurst = utils.compute_hurst(intensity["synthetic"])
     ful_hurst = utils.compute_hurst(intensity["real"])
-    return utils.measure_hellinger(cmp_cdf["synthetic"], cmp_cdf["real"]), utils.measure_MAE(cmp_cdf["synthetic"], cmp_cdf["real"]), np.abs(syn_hurst - ful_hurst)
+    #return utils.measure_hellinger(cmp_cdf["synthetic"], cmp_cdf["real"]), utils.measure_MAE(cmp_cdf["synthetic"], cmp_cdf["real"]), np.abs(syn_hurst - ful_hurst)
+    return utils.measure_hellinger(cmp_pdf["synthetic"], cmp_pdf["real"]), utils.measure_MAE(cmp_pdf["synthetic"], cmp_pdf["real"]), np.abs(syn_hurst - ful_hurst)
 
 
 def compare_autocorrelation(iat, bench_path, string):
@@ -140,8 +146,8 @@ def burst_comparison(fullsystem_path, synthetic_path, save_path):
     hell_iat, mae_iat, hurst_iat = compare_iat(iat, save_path)
     hell_int, mae_int, hurst_int = compare_intensity(intensity, save_path)
 
-    c_tmp, euc_tmp = compare_autocorrelation(temporal, save_path, "temporal")
-    c_iat, euc_iat = compare_autocorrelation(iat, save_path, "iat")
-    c_int, euc_int = compare_autocorrelation(intensity, save_path, "intensity")
+    #c_tmp, euc_tmp = compare_autocorrelation(temporal, save_path, "temporal")
+    #c_iat, euc_iat = compare_autocorrelation(iat, save_path, "iat")
+    #c_int, euc_int = compare_autocorrelation(intensity, save_path, "intensity")
 
     return hell_iat, mae_iat, hurst_iat, hell_int, mae_int, hurst_int
